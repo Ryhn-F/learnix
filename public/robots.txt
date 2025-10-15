@@ -1,0 +1,6 @@
+# robots.txt for Learnix
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://learnix.com/sitemap.xml
