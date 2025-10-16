@@ -35,6 +35,9 @@ yarn-error.log*
 
 # vercel
 .vercel
+API_RESPONSE_SPEED.md
+
+API_RESPONSE_VIDEO.md
 
 # typescript
 *.tsbuildinfo
