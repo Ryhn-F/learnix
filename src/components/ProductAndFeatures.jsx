@@ -70,6 +70,7 @@ const features = [
 
 export default function ProductAndFeatures() {
   const [activeFeature, setActiveFeature] = useState(3); // Card tengah aktif
+  const [showModal, setShowModal] = useState(false);
 
   const cardVariants = {
     inactive: {
@@ -175,7 +176,7 @@ export default function ProductAndFeatures() {
                 className={`relative cursor-pointer rounded-2xl p-6 transition-all duration-300 ${
                   isActive
                     ? "bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-blue-500/20 border-2 border-blue-400/50"
-                    : "bg-[#0f172a] border border-gray-700 hover:border-gray-600"
+                    : "bg-[#0f172a] border border-gray-700 hover:border-gray-600 hover:bg-purple-500/10"
                 }`}
                 style={{
                   transformOrigin: "center",
@@ -196,7 +197,6 @@ export default function ProductAndFeatures() {
                   className={`mb-4 ${
                     isActive ? "text-blue-400" : "text-gray-500"
                   }`}
-                 
                 >
                   <Icon className="text-4xl" />
                 </motion.div>
@@ -277,12 +277,68 @@ export default function ProductAndFeatures() {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={() => setShowModal(true)}
             className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full text-white font-semibold shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-shadow duration-300"
           >
             Mulai Sekarang
           </motion.button>
         </motion.div>
       </div>
+
+      {/* Development Modal */}
+      <AnimatePresence>
+        {showModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+            onClick={() => setShowModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="bg-gradient-to-br from-[#0f172a] to-[#1e293b] border border-blue-400/30 rounded-2xl p-8 max-w-md w-full shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Icon */}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring" }}
+                className="flex justify-center mb-6"
+              >
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                  <FaRocket className="text-3xl text-white" />
+                </div>
+              </motion.div>
+
+              {/* Title */}
+              <h3 className="text-2xl font-bold text-center mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                Sedang Dalam Pengembangan
+              </h3>
+
+              {/* Description */}
+              <p className="text-gray-400 text-center mb-6 leading-relaxed">
+                Kami sedang bekerja keras untuk menghadirkan pengalaman belajar
+                terbaik untuk Anda. Produk ini akan segera diluncurkan!
+              </p>
+
+              {/* Close Button */}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setShowModal(false)}
+                className="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full text-white font-semibold shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-shadow duration-300"
+              >
+                Mengerti
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Custom Shimmer Animation */}
       <style jsx>{`

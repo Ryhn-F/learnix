@@ -10,40 +10,6 @@ import {
   FaLightbulb,
 } from "react-icons/fa";
 
-// Animated Counter Component
-function AnimatedCounter({ value, suffix = "", duration = 2000 }) {
-  const ref = useRef(null);
-  const motionValue = useMotionValue(0);
-  const springValue = useSpring(motionValue, { duration });
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
-  useEffect(() => {
-    if (isInView) {
-      motionValue.set(value);
-    }
-  }, [isInView, motionValue, value]);
-
-  useEffect(() => {
-    springValue.on("change", (latest) => {
-      if (ref.current) {
-        ref.current.textContent = Math.floor(latest).toLocaleString() + suffix;
-      }
-    });
-  }, [springValue, suffix]);
-
-  return (
-    <motion.div
-      ref={ref}
-      className="text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent"
-      initial={{ opacity: 0, scale: 0.5 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
-    >
-      0{suffix}
-    </motion.div>
-  );
-}
 
 const features = [
   {
@@ -87,21 +53,69 @@ const features = [
   },
 ];
 
-const stats = [
-  { value: 50000, suffix: "+", label: "Active Users" },
-  { value: 1000, suffix: "+", label: "Courses Available" },
-  { value: 98, suffix: "%", label: "Success Rate" },
-  { value: 24, suffix: "/7", label: "Support" },
-];
 
 export default function KeyFeatures() {
   const [activeIndex, setActiveIndex] = useState(2); // Middle item active by default
-
-  // Auto-rotate effect (optional)
+  const scrollContainerRef = useRef(null);
 
   const handleFeatureClick = (index) => {
     setActiveIndex(index);
+    scrollToFeature(index);
   };
+
+  const scrollToFeature = (index) => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const items = container.children;
+      if (items[index]) {
+        const item = items[index];
+        item.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+          inline: "nearest",
+        });
+      }
+    }
+  };
+
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const containerRect = container.getBoundingClientRect();
+      const containerCenter = containerRect.top + containerRect.height / 2;
+      
+      const items = Array.from(container.children);
+      let closestIndex = 0;
+      let closestDistance = Infinity;
+      
+      items.forEach((item, index) => {
+        const itemRect = item.getBoundingClientRect();
+        const itemCenter = itemRect.top + itemRect.height / 2;
+        const distance = Math.abs(containerCenter - itemCenter);
+        
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
+        }
+      });
+      
+      if (closestIndex !== activeIndex) {
+        setActiveIndex(closestIndex);
+      }
+    }
+  };
+
+  useEffect(() => {
+    scrollToFeature(activeIndex);
+  }, []);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener("scroll", handleScroll);
+      return () => container.removeEventListener("scroll", handleScroll);
+    }
+  }, [activeIndex]);
 
   return (
     <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
@@ -113,30 +127,7 @@ export default function KeyFeatures() {
       />
 
       <div className="container mx-auto relative z-10 max-w-7xl">
-        {/* Stats Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="mb-20"
-        >
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="text-center"
-              >
-                <AnimatedCounter value={stat.value} suffix={stat.suffix} />
-                <p className="text-gray-400 mt-2 text-sm">{stat.label}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+        
 
         {/* Header */}
         <motion.div
@@ -173,32 +164,27 @@ export default function KeyFeatures() {
 
         {/* Main Features Section - 2 Column Grid */}
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left: Feature List with Roulette Effect */}
+          {/* Left: Feature List with Scroll Effect */}
           <div className="relative h-[500px] flex items-center">
-            <div className="w-full space-y-3">
+            {/* Gradient Overlays for Scroll Indication */}
+            <div className="absolute top-0 left-0 right-0 h-20  z-10 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-20  to-transparent z-10 pointer-events-none" />
+            
+            <div 
+              ref={scrollContainerRef}
+              className="w-full h-full overflow-y-auto scrollbar-hide space-y-3 py-[200px]"
+              style={{
+                scrollSnapType: "y mandatory",
+                scrollPaddingTop: "200px",
+                scrollPaddingBottom: "200px",
+              }}
+            >
               {features.map((feature, index) => {
                 const Icon = feature.icon;
                 const isActive = activeIndex === index;
 
-                // Calculate position relative to center (index 2)
-                const centerPosition = 2;
-                const offset = index - activeIndex;
-                const visualPosition = centerPosition + offset;
-
-                // Determine visibility and scale based on position
-                const isVisible = visualPosition >= 0 && visualPosition <= 4;
-                const distanceFromCenter = Math.abs(
-                  visualPosition - centerPosition
-                );
-                const scale = isActive
-                  ? 1
-                  : Math.max(0.9, 1 - distanceFromCenter * 0.05);
-                const opacity = isActive
-                  ? 1
-                  : Math.max(0.4, 1 - distanceFromCenter * 0.15);
-
-                // Hide items outside the visible range
-                if (!isVisible) return null;
+                const scale = isActive ? 1 : 0.95;
+                const opacity = isActive ? 1 : 0.5;
 
                 return (
                   <motion.div
@@ -223,6 +209,7 @@ export default function KeyFeatures() {
                     }`}
                     style={{
                       transformOrigin: "center",
+                      scrollSnapAlign: "center",
                     }}
                   >
                     {/* Glow Effect */}
@@ -322,7 +309,7 @@ export default function KeyFeatures() {
                 <img
                   src={features[activeIndex].image}
                   alt={features[activeIndex].title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               </motion.div>
 
@@ -332,6 +319,17 @@ export default function KeyFeatures() {
           </motion.div>
         </div>
       </div>
+
+      {/* Custom Scrollbar Hide */}
+      <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </section>
   );
 }

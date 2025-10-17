@@ -50,7 +50,7 @@ export default function Navbar() {
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center space-x-2">
+            <Link href="/" className="flex items-center space-x-1">
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 className="flex items-center"
@@ -58,9 +58,14 @@ export default function Navbar() {
                 <img 
                   src="/images/Logo.png" 
                   alt="Learnix Logo" 
-                  className="h-10 w-auto"
+                  className="h-16 w-auto"
                 />
               </motion.div>
+
+              <p className="text-white text-2xl font-medium">
+                Learnix
+
+              </p>
             </Link>
 
             {/* Desktop Menu */}

@@ -7,49 +7,101 @@ import FeatureCard from "@/components/FeatureCard";
 import StatsCounter from "@/components/StatsCounter";
 import ProductAndFeatures from "@/components/ProductAndFeatures";
 import KeyFeatures from "@/components/KeyFeatures";
+import { useRef, useEffect, useState } from "react";
+import {
+  useMotionTemplate,
+  useMotionValue,
+  useSpring,
+  useInView,
+} from "framer-motion";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6 }
+  transition: { duration: 0.6 },
 };
 
 const staggerContainer = {
   animate: {
     transition: {
-      staggerChildren: 0.1
-    }
-  }
+      staggerChildren: 0.1,
+    },
+  },
 };
+const stats = [
+  { value: 50000, suffix: "+", label: "Active Users" },
+  { value: 1000, suffix: "+", label: "Courses Available" },
+  { value: 98, suffix: "%", label: "Success Rate" },
+  { value: 24, suffix: "/7", label: "Support" },
+];
+
+// Animated Counter Component
+function AnimatedCounter({ value, suffix = "", duration = 2000 }) {
+  const ref = useRef(null);
+  const motionValue = useMotionValue(0);
+  const springValue = useSpring(motionValue, { duration });
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+  useEffect(() => {
+    if (isInView) {
+      motionValue.set(value);
+    }
+  }, [isInView, motionValue, value]);
+
+  useEffect(() => {
+    springValue.on("change", (latest) => {
+      if (ref.current) {
+        ref.current.textContent = Math.floor(latest).toLocaleString() + suffix;
+      }
+    });
+  }, [springValue, suffix]);
+
+  return (
+    <motion.div
+      ref={ref}
+      className="text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent"
+      initial={{ opacity: 0, scale: 0.5 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+    >
+      0{suffix}
+    </motion.div>
+  );
+}
 
 export default function Home() {
   const features = [
     {
       title: "AI Learning Assistant",
-      description: "Asisten AI yang membantu memahami materi dengan cara yang personal dan adaptif.",
-      icon: "🤖"
+      description:
+        "Asisten AI yang membantu memahami materi dengan cara yang personal dan adaptif.",
+      icon: "🤖",
     },
     {
       title: "Smart Notes",
-      description: "Catatan otomatis berbasis konteks yang memudahkan review materi.",
-      icon: "📝"
+      description:
+        "Catatan otomatis berbasis konteks yang memudahkan review materi.",
+      icon: "📝",
     },
     {
       title: "Realtime Progress",
-      description: "Analisis hasil belajar secara real-time dengan visualisasi yang jelas.",
-      icon: "📊"
+      description:
+        "Analisis hasil belajar secara real-time dengan visualisasi yang jelas.",
+      icon: "📊",
     },
     {
       title: "Gamified Learning",
-      description: "Sistem poin dan badge interaktif yang membuat belajar lebih menyenangkan.",
-      icon: "🎮"
-    }
+      description:
+        "Sistem poin dan badge interaktif yang membuat belajar lebih menyenangkan.",
+      icon: "🎮",
+    },
   ];
 
   return (
     <main className="relative">
       <ParticleBackground />
-      
+
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-20">
         <div className="container mx-auto text-center">
@@ -67,19 +119,20 @@ export default function Home() {
               <br />
               <span className="gradient-text">Lead the Future.</span>
             </motion.h1>
-            
+
             <motion.p
               variants={fadeInUp}
               className="text-xl sm:text-2xl text-foreground/70 max-w-3xl mx-auto"
             >
-              Platform pembelajaran pintar berbasis AI yang membantu Anda beradaptasi dengan dunia digital
+              Platform pembelajaran pintar berbasis AI yang membantu Anda
+              beradaptasi dengan dunia digital
             </motion.p>
-            
+
             <motion.div
               variants={fadeInUp}
               className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             >
-              <Link href="/features">
+              <Link href="/chatbot">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -88,8 +141,8 @@ export default function Home() {
                   Start Learning
                 </motion.button>
               </Link>
-              
-              <Link href="/about">
+
+              <Link href="/features">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -101,7 +154,7 @@ export default function Home() {
             </motion.div>
           </motion.div>
         </div>
-        
+
         {/* Scroll Indicator */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -121,6 +174,34 @@ export default function Home() {
 
       {/* Product & Features Section - New Interactive Component */}
       <ProductAndFeatures />
+      {/* Stats Section */}
+
+      <div className="container mx-auto relative z-10 max-w-7xl">
+       <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="mb-20"
+      >
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {stats.map((stat, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="text-center"
+            >
+              <AnimatedCounter value={stat.value} suffix={stat.suffix} />
+              <p className="text-gray-400 mt-2 text-sm">{stat.label}</p>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+      </div>
+     
 
       <KeyFeatures />
     </main>

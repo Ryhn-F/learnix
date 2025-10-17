@@ -140,7 +140,7 @@ export default function ChatbotPage() {
       <ParticleBackground />
 
       <div className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8">
-        <div className="container mx-auto max-w-5xl">
+        <div className="container mx-auto max-w-7xl">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -156,7 +156,9 @@ export default function ChatbotPage() {
             </p>
           </motion.div>
 
-          {/* Chat Container */}
+          {/* Main Layout: Chat + Features */}
+          <div className="flex flex-col gap-8">
+            {/* Chat Container */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -288,82 +290,49 @@ export default function ChatbotPage() {
                 </motion.button>
               </form>
             </div>
-          </motion.div>
+            </motion.div>
 
-          {/* Info Cards */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12"
-          >
-            {[
-              {
-                Icon: RiRobot2Fill,
-                title: "AI-Powered",
-                desc: "Didukung oleh teknologi AI terkini",
-                gradient: "from-blue-500 to-cyan-500",
-                bgGradient: "from-blue-500/10 to-cyan-500/10",
-                shadowColor: "rgba(59, 130, 246, 0.5)",
-              },
-              {
-                Icon: HiLightningBolt,
-                title: "Instant Response",
-                desc: "Jawaban cepat dan akurat",
-                gradient: "from-yellow-500 to-orange-500",
-                bgGradient: "from-yellow-500/10 to-orange-500/10",
-                shadowColor: "rgba(234, 179, 8, 0.5)",
-              },
-              {
-                Icon: IoPersonCircle,
-                title: "Personalized",
-                desc: "Disesuaikan dengan kebutuhan Anda",
-                gradient: "from-purple-500 to-pink-500",
-                bgGradient: "from-purple-500/10 to-pink-500/10",
-                shadowColor: "rgba(168, 85, 247, 0.5)",
-              },
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
-                whileHover={{ 
-                  scale: 1.05, 
-                  y: -10,
-                  transition: { duration: 0.3 }
-                }}
-                className="relative group"
-              >
-                <div 
-                  className={`glass-effect rounded-2xl p-8 text-center border border-primary/20 hover:border-primary/40 transition-all duration-300 overflow-hidden bg-gradient-to-br ${item.bgGradient}`}
-                  style={{
-                    boxShadow: `0 0 0 rgba(99, 102, 241, 0.2)`,
-                  }}
+            {/* Feature Points - Right Side (Horizontal) */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="flex flex-row gap-6 justify-center items-center"
+            >
+              {[
+                {
+                  Icon: RiRobot2Fill,
+                  title: "AI-Powered",
+                  desc: "Didukung oleh teknologi AI terkini",
+                  gradient: "from-blue-500 to-cyan-500",
+                },
+                {
+                  Icon: HiLightningBolt,
+                  title: "Instant Response",
+                  desc: "Jawaban cepat dan akurat",
+                  gradient: "from-yellow-500 to-orange-500",
+                },
+                {
+                  Icon: IoPersonCircle,
+                  title: "Personalized",
+                  desc: "Disesuaikan dengan kebutuhan Anda",
+                  gradient: "from-purple-500 to-pink-500",
+                },
+              ].map((item, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.5 + index * 0.15 }}
+                  whileHover={{ scale: 1.1, y: -8 }}
+                  className="relative group cursor-pointer flex flex-col items-center text-center"
                 >
-                  {/* Animated background glow */}
-                  <motion.div
-                    className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
-                    animate={{
-                      scale: [1, 1.2, 1],
-                    }}
-                    transition={{
-                      duration: 3,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                  />
-
-                  {/* Icon with animated glow */}
-                  <motion.div
-                    className="relative inline-block mb-4"
-                    whileHover={{ rotate: [0, -10, 10, -10, 0] }}
-                    transition={{ duration: 0.5 }}
-                  >
+                  {/* Circular Point with Glow */}
+                  <div className="relative flex-shrink-0 mb-4">
                     <motion.div
-                      className={`absolute inset-0 bg-gradient-to-br ${item.gradient} rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-300`}
+                      className={`absolute inset-0 bg-gradient-to-br ${item.gradient} rounded-full blur-2xl opacity-60 group-hover:opacity-100`}
                       animate={{
-                        scale: [1, 1.3, 1],
+                        scale: [1, 1.4, 1],
                       }}
                       transition={{
                         duration: 2,
@@ -371,28 +340,26 @@ export default function ChatbotPage() {
                         ease: "easeInOut",
                       }}
                     />
-                    <div className={`relative w-16 h-16 mx-auto rounded-full bg-gradient-to-br ${item.gradient} flex items-center justify-center shadow-lg`}>
-                      <item.Icon className="text-3xl text-white" />
+                    <div className={`relative w-24 h-24 rounded-full bg-gradient-to-br ${item.gradient} flex items-center justify-center shadow-2xl border-4 border-white/20 group-hover:border-white/40 transition-all duration-300`}>
+                      <item.Icon className="text-5xl text-white" />
                     </div>
-                  </motion.div>
+                  </div>
 
-                  {/* Title with gradient */}
-                  <h3 className={`text-xl font-bold mb-3 bg-gradient-to-r ${item.gradient} bg-clip-text text-transparent`}>
-                    {item.title}
-                  </h3>
+                  {/* Text Content */}
+                  <div className="max-w-[140px]">
+                    <h3 className={`text-lg font-bold mb-2 bg-gradient-to-r ${item.gradient} bg-clip-text text-transparent`}>
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-foreground/70 leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
 
-                  {/* Description */}
-                  <p className="text-sm text-foreground/70 leading-relaxed">
-                    {item.desc}
-                  </p>
-
-                  {/* Decorative corner elements */}
-                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary/5 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-tr from-secondary/5 to-transparent rounded-tr-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+                
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
         </div>
       </div>
 

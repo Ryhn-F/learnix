@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 const cardVariants = {
   initial: { opacity: 0, y: 50 },
-  animate: { opacity: 1, y: 0 }
+  animate: { opacity: 1, y: 0 },
 };
 
 export default function FeatureCard({ title, description, icon, index }) {

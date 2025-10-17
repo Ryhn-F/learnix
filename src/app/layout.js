@@ -12,6 +12,9 @@ const inter = Inter({
 export const metadata = {
   title: "Learnix - Smart Learning for the Future",
   description: "Platform pembelajaran pintar berbasis AI untuk generasi masa depan. Technology for New Era.",
+     icons: {
+    icon: [
+      { url: '/public/images/Logo.png' },]},
   keywords: "AI learning, smart education, technology, future learning, e-learning, online education",
   authors: [{ name: "Learnix Team" }],
   openGraph: {
@@ -20,6 +23,7 @@ export const metadata = {
     type: "website",
     locale: "id_ID",
   },
+  
   twitter: {
     card: "summary_large_image",
     title: "Learnix - Smart Learning for the Future",
