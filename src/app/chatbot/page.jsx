@@ -3,9 +3,11 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ParticleBackground from "@/components/ParticleBackground";
-import { HiSparkles, HiLightningBolt } from "react-icons/hi";
+import { HiLightningBolt } from "react-icons/hi";
 import { IoPersonCircle } from "react-icons/io5";
 import { RiRobot2Fill } from "react-icons/ri";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export default function ChatbotPage() {
   const [messages, setMessages] = useState([
@@ -19,7 +21,6 @@ export default function ChatbotPage() {
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [showChoices, setShowChoices] = useState(true);
-  const [shouldScroll, setShouldScroll] = useState(true);
   const messagesEndRef = useRef(null);
 
   // Predefined questions and answers
@@ -52,27 +53,24 @@ export default function ChatbotPage() {
   ];
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   };
 
   useEffect(() => {
-    if (shouldScroll) {
-      scrollToBottom();
-    }
-  }, [messages, shouldScroll]);
+    scrollToBottom();
+  }, [messages]);
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!inputValue.trim()) return;
 
-    // Enable auto-scroll for manual text input
-    setShouldScroll(true);
-
+    const userInput = inputValue;
+    
     // Add user message
     const userMessage = {
       id: Date.now(),
       type: "user",
-      text: inputValue,
+      text: userInput,
       timestamp: new Date(),
     };
 
@@ -81,33 +79,48 @@ export default function ChatbotPage() {
     setIsTyping(true);
     setShowChoices(false);
 
-    // Simulate bot response
-    setTimeout(() => {
-      const botResponses = [
-        "Terima kasih atas pertanyaannya! Saya di sini untuk membantu Anda belajar lebih efektif.",
-        "Itu pertanyaan yang bagus! Mari kita eksplorasi topik ini bersama-sama.",
-        "Saya dapat membantu Anda dengan materi pembelajaran, tips belajar, dan banyak lagi!",
-        "Dengan Learnix, belajar menjadi lebih personal dan menyenangkan. Ada yang ingin Anda pelajari?",
-        "Saya siap membantu! Apakah Anda ingin memulai dengan topik tertentu?",
-      ];
+    try {
+      // Call Gemini API via our backend route
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: userInput }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to get response");
+      }
 
       const botMessage = {
         id: Date.now(),
         type: "bot",
-        text: botResponses[Math.floor(Math.random() * botResponses.length)],
+        text: data.response,
         timestamp: new Date(),
       };
 
       setMessages((prev) => [...prev, botMessage]);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      
+      const errorMessage = {
+        id: Date.now(),
+        type: "bot",
+        text: "Maaf, terjadi kesalahan saat memproses pertanyaan Anda. Silakan coba lagi atau pilih salah satu pertanyaan yang tersedia.",
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
       setShowChoices(true);
-    }, 800);
+    }
   };
 
   const handleChoiceClick = (choice) => {
-    // Disable auto-scroll for choice clicks
-    setShouldScroll(false);
-    
     // Add user message
     const userMessage = {
       id: Date.now(),
@@ -189,7 +202,15 @@ export default function ChatbotPage() {
                           : "glass-effect border border-blue-400/20 text-gray-200"
                       }`}
                     >
-                      <p className="text-sm sm:text-base">{message.text}</p>
+                      {message.type === "bot" ? (
+                        <div className="text-sm sm:text-base prose prose-invert prose-sm max-w-none">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {message.text}
+                          </ReactMarkdown>
+                        </div>
+                      ) : (
+                        <p className="text-sm sm:text-base">{message.text}</p>
+                      )}
                       <span className="text-xs opacity-60 mt-1 block">
                         {message.timestamp.toLocaleTimeString("id-ID", {
                           hour: "2-digit",
@@ -363,7 +384,7 @@ export default function ChatbotPage() {
         </div>
       </div>
 
-      <style jsx>{`
+      <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
@@ -377,6 +398,104 @@ export default function ChatbotPage() {
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+        }
+
+        /* Markdown Styling for Bot Messages */
+        .prose-invert {
+          color: rgb(229, 231, 235);
+        }
+        .prose-invert h1,
+        .prose-invert h2,
+        .prose-invert h3,
+        .prose-invert h4 {
+          color: rgb(147, 197, 253);
+          font-weight: 700;
+          margin-top: 1em;
+          margin-bottom: 0.5em;
+        }
+        .prose-invert h1 {
+          font-size: 1.5em;
+        }
+        .prose-invert h2 {
+          font-size: 1.3em;
+        }
+        .prose-invert h3 {
+          font-size: 1.1em;
+        }
+        .prose-invert strong {
+          color: rgb(191, 219, 254);
+          font-weight: 600;
+        }
+        .prose-invert em {
+          color: rgb(196, 181, 253);
+          font-style: italic;
+        }
+        .prose-invert code {
+          background: rgba(99, 102, 241, 0.2);
+          color: rgb(196, 181, 253);
+          padding: 0.2em 0.4em;
+          border-radius: 0.25em;
+          font-size: 0.9em;
+          font-family: 'Courier New', monospace;
+        }
+        .prose-invert pre {
+          background: rgba(30, 41, 59, 0.5);
+          border: 1px solid rgba(99, 102, 241, 0.3);
+          border-radius: 0.5em;
+          padding: 1em;
+          overflow-x: auto;
+          margin: 0.5em 0;
+        }
+        .prose-invert pre code {
+          background: transparent;
+          padding: 0;
+          color: rgb(226, 232, 240);
+        }
+        .prose-invert ul,
+        .prose-invert ol {
+          margin: 0.5em 0;
+          padding-left: 1.5em;
+        }
+        .prose-invert li {
+          margin: 0.25em 0;
+        }
+        .prose-invert blockquote {
+          border-left: 3px solid rgb(99, 102, 241);
+          padding-left: 1em;
+          margin: 0.5em 0;
+          color: rgb(203, 213, 225);
+          font-style: italic;
+        }
+        .prose-invert a {
+          color: rgb(147, 197, 253);
+          text-decoration: underline;
+        }
+        .prose-invert a:hover {
+          color: rgb(191, 219, 254);
+        }
+        .prose-invert p {
+          margin: 0.5em 0;
+          line-height: 1.6;
+        }
+        .prose-invert table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 0.5em 0;
+        }
+        .prose-invert th,
+        .prose-invert td {
+          border: 1px solid rgba(99, 102, 241, 0.3);
+          padding: 0.5em;
+          text-align: left;
+        }
+        .prose-invert th {
+          background: rgba(99, 102, 241, 0.2);
+          font-weight: 600;
+        }
+        .prose-invert hr {
+          border: none;
+          border-top: 1px solid rgba(99, 102, 241, 0.3);
+          margin: 1em 0;
         }
       `}</style>
     </main>

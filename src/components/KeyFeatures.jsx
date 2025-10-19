@@ -10,7 +10,6 @@ import {
   FaLightbulb,
 } from "react-icons/fa";
 
-
 const features = [
   {
     id: 1,
@@ -53,14 +52,16 @@ const features = [
   },
 ];
 
-
 export default function KeyFeatures() {
-  const [activeIndex, setActiveIndex] = useState(2); // Middle item active by default
+  const [activeIndex, setActiveIndex] = useState(0);
   const scrollContainerRef = useRef(null);
 
   const handleFeatureClick = (index) => {
     setActiveIndex(index);
-    scrollToFeature(index);
+    // On desktop, scroll to feature
+    if (window.innerWidth >= 1024) {
+      scrollToFeature(index);
+    }
   };
 
   const scrollToFeature = (index) => {
@@ -79,26 +80,26 @@ export default function KeyFeatures() {
   };
 
   const handleScroll = () => {
-    if (scrollContainerRef.current) {
+    if (scrollContainerRef.current && window.innerWidth >= 1024) {
       const container = scrollContainerRef.current;
       const containerRect = container.getBoundingClientRect();
       const containerCenter = containerRect.top + containerRect.height / 2;
-      
+
       const items = Array.from(container.children);
       let closestIndex = 0;
       let closestDistance = Infinity;
-      
+
       items.forEach((item, index) => {
         const itemRect = item.getBoundingClientRect();
         const itemCenter = itemRect.top + itemRect.height / 2;
         const distance = Math.abs(containerCenter - itemCenter);
-        
+
         if (distance < closestDistance) {
           closestDistance = distance;
           closestIndex = index;
         }
       });
-      
+
       if (closestIndex !== activeIndex) {
         setActiveIndex(closestIndex);
       }
@@ -106,12 +107,14 @@ export default function KeyFeatures() {
   };
 
   useEffect(() => {
-    scrollToFeature(activeIndex);
+    if (window.innerWidth >= 1024) {
+      scrollToFeature(2); // Middle item on desktop
+    }
   }, []);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
-    if (container) {
+    if (container && window.innerWidth >= 1024) {
       container.addEventListener("scroll", handleScroll);
       return () => container.removeEventListener("scroll", handleScroll);
     }
@@ -127,8 +130,6 @@ export default function KeyFeatures() {
       />
 
       <div className="container mx-auto relative z-10 max-w-7xl">
-        
-
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -162,15 +163,15 @@ export default function KeyFeatures() {
           </h2>
         </motion.div>
 
-        {/* Main Features Section - 2 Column Grid */}
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        {/* Desktop Layout: 2 Column Grid */}
+        <div className="hidden lg:grid lg:grid-cols-2 gap-12 items-center">
           {/* Left: Feature List with Scroll Effect */}
           <div className="relative h-[500px] flex items-center">
             {/* Gradient Overlays for Scroll Indication */}
-            <div className="absolute top-0 left-0 right-0 h-20  z-10 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 right-0 h-20  to-transparent z-10 pointer-events-none" />
-            
-            <div 
+            <div className="absolute top-0 left-0 right-0 h-20 z-10 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-20 to-transparent z-10 pointer-events-none" />
+
+            <div
               ref={scrollContainerRef}
               className="w-full h-full overflow-y-auto scrollbar-hide space-y-3 py-[200px]"
               style={{
@@ -317,6 +318,155 @@ export default function KeyFeatures() {
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a14]/50 to-transparent pointer-events-none" />
             </div>
           </motion.div>
+        </div>
+
+        {/* Mobile Layout: Progressive Step Design */}
+        <div className="lg:hidden">
+          {/* Active Feature Display */}
+          <motion.div
+            key={activeIndex}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-8"
+          >
+            {/* Icon */}
+            <motion.div
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.5, type: "spring" }}
+              className="inline-block mb-6"
+            >
+              <div className="relative">
+                {/* Glow Effect */}
+                <motion.div
+                  className="absolute inset-0 rounded-full"
+                  animate={{
+                    boxShadow: [
+                      "0 0 20px rgba(56,189,248,0.4)",
+                      "0 0 40px rgba(56,189,248,0.6)",
+                      "0 0 20px rgba(56,189,248,0.4)",
+                    ],
+                  }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+                <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-2 border-blue-400/40 flex items-center justify-center">
+                  {(() => {
+                    const Icon = features[activeIndex].icon;
+                    return <Icon className="text-5xl text-blue-400" />;
+                  })()}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Title */}
+            <motion.h3
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-2xl sm:text-3xl font-bold text-blue-400 mb-3"
+            >
+              {features[activeIndex].title}
+            </motion.h3>
+
+            {/* Description */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="text-sm sm:text-base text-gray-400 max-w-md mx-auto leading-relaxed"
+            >
+              {features[activeIndex].description}
+            </motion.p>
+          </motion.div>
+
+          {/* Image Preview */}
+          <motion.div
+            key={`img-${activeIndex}`}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.05 }}
+            transition={{ duration: 0.5 }}
+            className="relative h-[300px] sm:h-[400px] rounded-2xl overflow-hidden mb-8"
+          >
+            <div className="relative w-full h-full bg-gradient-to-br from-blue-900/20 to-purple-900/20 rounded-2xl border border-blue-500/30 overflow-hidden">
+              {/* Glow Border */}
+              <motion.div
+                className="absolute inset-0 rounded-2xl"
+                animate={{
+                  boxShadow: [
+                    "0 0 20px rgba(56,189,248,0.3)",
+                    "0 0 40px rgba(139,92,246,0.4)",
+                    "0 0 20px rgba(56,189,248,0.3)",
+                  ],
+                }}
+                transition={{ duration: 3, repeat: Infinity }}
+              />
+
+              {/* Image */}
+              <img
+                src={features[activeIndex].image}
+                alt={features[activeIndex].title}
+                className="w-full h-full object-contain"
+              />
+
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a14]/50 to-transparent pointer-events-none" />
+            </div>
+          </motion.div>
+
+          {/* Navigation Dots */}
+          <div className="flex justify-center items-center gap-3 flex-wrap">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              const isActive = activeIndex === index;
+
+              return (
+                <motion.button
+                  key={feature.id}
+                  onClick={() => handleFeatureClick(index)}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`relative transition-all duration-300 ${
+                    isActive ? "w-14 h-14" : "w-12 h-12"
+                  }`}
+                >
+                  {/* Glow for Active */}
+                  {isActive && (
+                    <motion.div
+                      className="absolute inset-0 rounded-full"
+                      animate={{
+                        boxShadow: [
+                          "0 0 15px rgba(56,189,248,0.4)",
+                          "0 0 25px rgba(56,189,248,0.6)",
+                          "0 0 15px rgba(56,189,248,0.4)",
+                        ],
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  )}
+
+                  {/* Button */}
+                  <div
+                    className={`relative w-full h-full rounded-full flex items-center justify-center transition-all duration-300 ${
+                      isActive
+                        ? "bg-blue-500/30 border-2 border-blue-400"
+                        : "bg-[#0f172a]/50 border border-gray-700/50 hover:border-blue-400/50"
+                    }`}
+                  >
+                    <Icon
+                      className={`transition-all duration-300 ${
+                        isActive
+                          ? "text-blue-400 text-xl"
+                          : "text-gray-500 text-lg"
+                      }`}
+                    />
+                  </div>
+                </motion.button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
