@@ -17,7 +17,7 @@ const features = [
     title: "AI Learning Assistant",
     description:
       "Asisten pembelajaran berbasis AI yang memahami gaya belajar Anda",
-    image: "/images/features1.png",
+    image: "/images/feature1.png",
   },
   {
     id: 2,
