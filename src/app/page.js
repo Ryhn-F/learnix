@@ -132,7 +132,7 @@ export default function Home() {
               variants={fadeInUp}
               className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             >
-              <Link href="/chatbot">
+              <a href="https://learnix-dash.vercel.app/">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -140,7 +140,7 @@ export default function Home() {
                 >
                   Start Learning
                 </motion.button>
-              </Link>
+              </a>
 
               <Link href="/features">
                 <motion.button
@@ -177,31 +177,30 @@ export default function Home() {
       {/* Stats Section */}
 
       <div className="container mx-auto relative z-10 max-w-7xl">
-       <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        className="mb-20"
-      >
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {stats.map((stat, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="text-center"
-            >
-              <AnimatedCounter value={stat.value} suffix={stat.suffix} />
-              <p className="text-gray-400 mt-2 text-sm">{stat.label}</p>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mb-20"
+        >
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="text-center"
+              >
+                <AnimatedCounter value={stat.value} suffix={stat.suffix} />
+                <p className="text-gray-400 mt-2 text-sm">{stat.label}</p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
       </div>
-     
 
       <KeyFeatures />
     </main>
